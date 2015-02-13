@@ -39,7 +39,7 @@ class ESReindex
     %w{
       if unless mappings settings before_create after_create before_each after_each after_copy
     }.each do |callback|
-      if options[callback.to_sym].present? && !options[callback.to_sym].respond_to?(:call)
+      if options.has_key?(callback.to_sym) && !options[callback.to_sym].respond_to?(:call)
         raise ArgumentError, "#{callback} must be a callable object"
       end
     end
@@ -65,8 +65,8 @@ class ESReindex
 
   def okay_to_proceed?
     okay = true
-    okay = options[:if].call(sclient, dclient) if options[:if].present?
-    okay = (okay && !(options[:unless].call sclient, dclient)) if options[:unless].present?
+    okay = options[:if].call(sclient, dclient) if options.has_key?(:if)
+    okay = (okay && !(options[:unless].call sclient, dclient)) if options.has_key?(:unless)
     log 'Skipping action due to guard callbacks' unless okay
     okay
   end
